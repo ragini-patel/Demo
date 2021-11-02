@@ -7,9 +7,12 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class PlayerController {
+    private final PlayerService playerService;
 
     @Autowired
-    private PlayerService playerService;
+    public PlayerController(PlayerService playerService) {
+        this.playerService = playerService;
+    }
 
     @PostMapping("/api/players/create")
     public Player createPlayer(@RequestBody Player player) {
