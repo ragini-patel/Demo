@@ -23,4 +23,9 @@ public class PlayerServiceImpl implements PlayerService {
     public Player getById(String id) {
         return playerRepository.findById(id).get();
     }
+
+    @Override
+    public Player updatePlayer(String id, Player player) {
+        return playerRepository.save(player);
+    }
 }

@@ -14,13 +14,18 @@ public class PlayerController {
         this.playerService = playerService;
     }
 
-    @PostMapping("/api/players/create")
+    @GetMapping("/api/players/{id}")
+    public Player getById(@PathVariable("id") String id) {
+        return playerService.getById(id);
+    }
+
+    @PostMapping("/api/players")
     public Player createPlayer(@RequestBody Player player) {
         return playerService.createPlayer(player);
     }
 
-    @GetMapping("/api/players/{id}")
-    public Player getById(@PathVariable("id") String id) {
-        return playerService.getById(id);
+    @PutMapping("/api/players/id")
+    public Player updatePlayer(@PathVariable("id") String id, @RequestBody Player player) {
+        return playerService.updatePlayer(id, player);
     }
 }
