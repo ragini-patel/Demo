@@ -5,7 +5,7 @@ import java.util.List;
 
 @Data
 public class Over {
-    private Integer seq;
+    private Integer number;
     private List<Ball> balls;
     private Score score;
 }

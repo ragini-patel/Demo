@@ -13,12 +13,17 @@ public class Match {
     @Id
     private String id;
     private Integer noOfOvers;
-    private List<Over> overs;
     private String battingTeamId;
     private String bowlingTeamId;
-    private String battingTeamStatId;
-    private String bowlingTeamStatId;
-    private Dictionary<String, String> players;
+    private TeamStat battingTeamStat;
+    private TeamStat bowlingTeamStat;
+    private List<PlayerStat> playersStats;
+    private Integer currentOverNumber;
+    private Integer currentBallNumber;
+    private String currentFirstBatsmanId;
+    private String currentSecondBatsmanId;
+    private String currentBowlerId;
+    private List<Over> overs;
     private Score score;
     private MatchState matchState;
 }
