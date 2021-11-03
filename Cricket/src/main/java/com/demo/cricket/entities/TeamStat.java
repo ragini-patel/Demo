@@ -4,13 +4,13 @@ import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection  = "player")
+@Document(collection  = "teamstat")
 @Data
-public class Player {
+public class TeamStat {
     @Id
     private String id;
-    private String firstName;
-    private String lastName;
-    private String email;
     private String teamId;
+    private String matchId;
+    private TeamType teamType;
+    private Score score;
 }
