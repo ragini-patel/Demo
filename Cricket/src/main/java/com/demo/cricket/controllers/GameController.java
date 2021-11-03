@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Dictionary;
+import java.util.List;
 
 @RestController
 public class GameController {
@@ -37,14 +38,16 @@ public class GameController {
         Match match = matchService.getMatchById(id);
 
         // create team stats
-        String battingTeamStatId = teamStatService.createBattingTeamStat(match.getBattingTeamId(), match.getId());
-        String bowlingTeamStatId = teamStatService.createBowlingTeamStat(match.getBowlingTeamId(), match.getId());
-        match.setBattingTeamId(battingTeamStatId);
-        match.setBowlingTeamId(bowlingTeamStatId);
+        TeamStat battingTeamStat = teamStatService.createBattingTeamStat(match.getBattingTeamId(), match.getId());
+        TeamStat bowlingTeamStat = teamStatService.createBowlingTeamStat(match.getBowlingTeamId(), match.getId());
+        match.setBattingTeamStat(battingTeamStat);
+        match.setBowlingTeamStat(bowlingTeamStat);
 
         // create players stats
-        Dictionary<String, String> playersStats = playerStatService.createPlayersStats(match);
-        match.setPlayersStats(playersStats);
+        List<PlayerStat> playerStatList = playerStatService.createPlayersStats(match);
+        match.setPlayersStats(playerStatList);
+
+        // todo: set current batsman and bowler details
 
         match.setMatchState(MatchState.INPROGRESS);
         return matchService.updateMatch(match);

@@ -17,16 +17,16 @@ public class TeamStatServiceImpl implements TeamStatService {
     }
 
     @Override
-    public String createBattingTeamStat(String battingTeamId, String matchId) {
+    public TeamStat createBattingTeamStat(String battingTeamId, String matchId) {
         TeamStat teamStat = new TeamStat(battingTeamId, matchId, TeamType.BATTIG);
         teamStat =  teamStatRepository.save(teamStat);
-        return teamStat.getId();
+        return teamStat;
     }
 
     @Override
-    public String createBowlingTeamStat(String bowlingTeamId, String matchId) {
+    public TeamStat createBowlingTeamStat(String bowlingTeamId, String matchId) {
         TeamStat teamStat = new TeamStat(bowlingTeamId, matchId, TeamType.BOWLING);
         teamStat =  teamStatRepository.save(teamStat);
-        return teamStat.getId();
+        return teamStat;
     }
 }

@@ -1,9 +1,10 @@
 package com.demo.cricket.services;
 
 import com.demo.cricket.entities.Match;
-import java.util.Dictionary;
+import com.demo.cricket.entities.PlayerStat;
+import java.util.List;
 
 public interface PlayerStatService {
 
-    Dictionary<String, String> createPlayersStats(Match match);
+    List<PlayerStat> createPlayersStats(Match match);
 }

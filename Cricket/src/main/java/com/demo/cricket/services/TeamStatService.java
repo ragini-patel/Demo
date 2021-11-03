@@ -1,7 +1,9 @@
 package com.demo.cricket.services;
 
-public interface TeamStatService {
-    String createBattingTeamStat(String battingTeamId, String matchId);
+import com.demo.cricket.entities.TeamStat;
 
-    String createBowlingTeamStat(String bowlingTeamId, String matchId);
+public interface TeamStatService {
+    TeamStat createBattingTeamStat(String battingTeamId, String matchId);
+
+    TeamStat createBowlingTeamStat(String bowlingTeamId, String matchId);
 }

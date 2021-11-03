@@ -4,9 +4,10 @@ import lombok.Data;
 
 @Data
 public class Ball {
-    private Integer seq;
-    private Integer overSeq;
+    private Integer number;
+    private Integer overNumber;
     private String firstBatsmanId;
     private String secondBatsmanId;
     private String bowlerId;
+    private Score score;
 }
