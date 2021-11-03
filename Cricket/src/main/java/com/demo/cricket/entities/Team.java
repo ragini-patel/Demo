@@ -11,6 +11,6 @@ import java.util.List;
 public class Team {
     @Id
     private String id;
-    private String teamName;
-    private List<String> teamMembers;
+    private String name;
+    private List<String> players;
 }

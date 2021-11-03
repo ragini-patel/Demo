@@ -18,7 +18,7 @@ public class Match {
     private String bowlingTeamId;
     private String battingTeamStatId;
     private String bowlingTeamStatId;
-    private Dictionary<String, String> players;
+    private Dictionary<String, String> playersStats;
     private Score score;
     private MatchState matchState;
 }
