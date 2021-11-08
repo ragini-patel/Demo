@@ -16,11 +16,13 @@ public class PlayerStat {
     private String teamId;
     private PlayerType playerType;
     private Score score;
+    private PlayerState playerState;
 
     public PlayerStat(String playerId, String matchId, String teamId, PlayerType playerType) {
         this.playerId = playerId;
         this.matchId = matchId;
         this.teamId = teamId;
         this.playerType = playerType;
+        this.playerState = PlayerState.NOTOUT;
     }
 }

@@ -1,10 +1,11 @@
 package com.demo.cricket.entities;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Dictionary;
+import java.util.ArrayList;
 import java.util.List;
 
 @Document(collection  = "match")
@@ -26,4 +27,10 @@ public class Match {
     private List<Over> overs;
     private Score score;
     private MatchState matchState;
+
+    public Match() {
+        playersStats = new ArrayList<>();
+        overs = new ArrayList<>();
+        matchState = MatchState.NOTSTARTED;
+    }
 }
