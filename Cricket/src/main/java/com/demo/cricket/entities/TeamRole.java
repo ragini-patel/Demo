@@ -1,5 +1,5 @@
 package com.demo.cricket.entities;
 
-public enum TeamType {
+public enum TeamRole {
     BATTIG, BOWLING
 }

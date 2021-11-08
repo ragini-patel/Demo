@@ -1,10 +1,14 @@
 package com.demo.cricket.entities;
 
 import lombok.Data;
+import lombok.NonNull;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.util.Pair;
 
-import java.util.Dictionary;
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Document(collection  = "match")
@@ -12,18 +16,22 @@ import java.util.List;
 public class Match {
     @Id
     private String id;
+    @NonNull
     private Integer noOfOvers;
-    private String battingTeamId;
-    private String bowlingTeamId;
-    private TeamStat battingTeamStat;
-    private TeamStat bowlingTeamStat;
-    private List<PlayerStat> playersStats;
-    private Integer currentOverNumber;
-    private Integer currentBallNumber;
-    private String currentFirstBatsmanId;
-    private String currentSecondBatsmanId;
-    private String currentBowlerId;
-    private List<Over> overs;
-    private Score score;
+    @NonNull
+    private String firstTeamId;
+    @NonNull
+    private String secondTeamId;
+    private Innings firstInnings;
+    private Innings secondInnings;
+    private Integer currentInningNumber;
+    private String tossWinnerTeamId;
+    private TeamRole tossWinnerTeamRole;
     private MatchState matchState;
+    private OffsetDateTime createdOn;
+    private OffsetDateTime updatedOn;
+
+    public Match() {
+        matchState = MatchState.NOTSTARTED;
+    }
 }

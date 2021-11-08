@@ -5,6 +5,9 @@ import com.demo.cricket.repositories.PlayerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+
 @Service
 public class PlayerServiceImpl implements PlayerService {
     private final PlayerRepository playerRepository;
@@ -16,6 +19,8 @@ public class PlayerServiceImpl implements PlayerService {
 
     @Override
     public Player createPlayer(Player player) {
+        player.setCreatedOn(OffsetDateTime.now(ZoneOffset.UTC));
+        player.setUpdatedOn(OffsetDateTime.now(ZoneOffset.UTC));
         return playerRepository.save(player);
     }
 
