@@ -1,32 +1,33 @@
 package com.demo.cricket.services;
 
+import com.demo.cricket.entities.TeamRole;
 import com.demo.cricket.entities.TeamStat;
-import com.demo.cricket.entities.TeamType;
-import com.demo.cricket.repositories.TeamStatRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class TeamStatServiceImpl implements TeamStatService {
 
-    private final TeamStatRepository teamStatRepository;
+    private final PlayerStatService playerStatService;
 
     @Autowired
-    public TeamStatServiceImpl(TeamStatRepository teamStatRepository) {
-        this.teamStatRepository = teamStatRepository;
+    public TeamStatServiceImpl(PlayerStatService playerStatService) {
+        this.playerStatService = playerStatService;
     }
 
     @Override
-    public TeamStat createBattingTeamStat(String battingTeamId, String matchId) {
-        TeamStat teamStat = new TeamStat(battingTeamId, matchId, TeamType.BATTIG);
-        teamStat =  teamStatRepository.save(teamStat);
+    public TeamStat createBattingTeamStat(String battingTeamId) {
+        TeamStat teamStat = new TeamStat(battingTeamId, TeamRole.BATTIG);
+        var playersStat = playerStatService.createPlayersStats(battingTeamId);
+        teamStat.setPlayersStat(playersStat);
         return teamStat;
     }
 
     @Override
-    public TeamStat createBowlingTeamStat(String bowlingTeamId, String matchId) {
-        TeamStat teamStat = new TeamStat(bowlingTeamId, matchId, TeamType.BOWLING);
-        teamStat =  teamStatRepository.save(teamStat);
+    public TeamStat createBowlingTeamStat(String bowlingTeamId) {
+        TeamStat teamStat = new TeamStat(bowlingTeamId, TeamRole.BOWLING);
+        var playersStat = playerStatService.createPlayersStats(bowlingTeamId);
+        teamStat.setPlayersStat(playersStat);
         return teamStat;
     }
 }

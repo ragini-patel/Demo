@@ -2,23 +2,20 @@ package com.demo.cricket.entities;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import java.util.ArrayList;
+import java.util.List;
 
-@Document(collection  = "teamstat")
 @Data
 @NoArgsConstructor
 public class TeamStat {
-    @Id
-    private String id;
     private String teamId;
-    private String matchId;
-    private TeamType teamType;
+    private TeamRole teamRole;
+    private List<PlayerStat> playersStat;
     private Score score;
 
-    public TeamStat(String teamId, String matchId, TeamType teamType) {
+    public TeamStat(String teamId, TeamRole teamType) {
         this.teamId = teamId;
-        this.matchId = matchId;
-        this.teamType = teamType;
+        this.teamRole = teamRole;
+        this.playersStat = new ArrayList<>();
     }
 }
