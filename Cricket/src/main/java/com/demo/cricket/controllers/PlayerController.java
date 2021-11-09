@@ -3,7 +3,10 @@ package com.demo.cricket.controllers;
 import com.demo.cricket.entities.Player;
 import com.demo.cricket.services.PlayerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 
 @RestController
 public class PlayerController {
@@ -15,8 +18,9 @@ public class PlayerController {
     }
 
     @GetMapping("/api/players/{id}")
-    public Player getById(@PathVariable("id") String id) {
-        return playerService.getById(id);
+    public ResponseEntity<Player> getById(@PathVariable("id") String id) {
+        Player player = playerService.getById(id);
+        return player != null ? new ResponseEntity<>(player, HttpStatus.OK) : new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @PostMapping("/api/players")

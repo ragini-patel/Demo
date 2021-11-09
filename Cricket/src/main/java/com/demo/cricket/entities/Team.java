@@ -6,9 +6,8 @@ import lombok.NonNull;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Document(collection  = "team")
@@ -20,8 +19,8 @@ public class Team {
     @NonNull
     private String name;
     private List<String> players;
-    private OffsetDateTime createdOn;
-    private OffsetDateTime updatedOn;
+    private LocalDateTime createdOn;
+    private LocalDateTime updatedOn;
 
     public Team(String id, String name) {
         this.id = id;

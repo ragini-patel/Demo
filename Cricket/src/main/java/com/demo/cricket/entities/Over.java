@@ -6,7 +6,7 @@ import java.util.List;
 
 @Data
 public class Over {
-    private Integer number;
+    private int number;
     private List<Ball> balls;
     private Score score;
 

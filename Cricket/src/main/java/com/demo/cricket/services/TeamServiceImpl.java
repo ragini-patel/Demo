@@ -4,8 +4,7 @@ import com.demo.cricket.entities.Team;
 import com.demo.cricket.repositories.TeamRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
 @Service
@@ -20,8 +19,8 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     public Team createTeam(Team team) {
-        team.setCreatedOn(OffsetDateTime.now(ZoneOffset.UTC));
-        team.setUpdatedOn(OffsetDateTime.now(ZoneOffset.UTC));
+        team.setCreatedOn(LocalDateTime.now(ZoneOffset.UTC));
+        team.setUpdatedOn(LocalDateTime.now(ZoneOffset.UTC));
         return teamRepository.save(team);
     }
 

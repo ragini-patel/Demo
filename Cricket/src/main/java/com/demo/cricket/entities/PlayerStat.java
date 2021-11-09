@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PlayerStat {
     private String playerId;
-    private Score score;
     private PlayerState playerState;
 
     public PlayerStat(String playerId) {

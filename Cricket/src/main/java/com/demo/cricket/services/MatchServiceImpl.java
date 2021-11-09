@@ -4,10 +4,8 @@ import com.demo.cricket.entities.Match;
 import com.demo.cricket.repositories.MatchRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.Date;
 
 @Service
 public class MatchServiceImpl implements MatchService {
@@ -26,14 +24,14 @@ public class MatchServiceImpl implements MatchService {
 
     @Override
     public Match createMatch(Match match) {
-        match.setCreatedOn(OffsetDateTime.now(ZoneOffset.UTC));
-        match.setUpdatedOn(OffsetDateTime.now(ZoneOffset.UTC));
+        match.setCreatedOn(LocalDateTime.now(ZoneOffset.UTC));
+        match.setUpdatedOn(LocalDateTime.now(ZoneOffset.UTC));
         return matchRepository.save(match);
     }
 
     @Override
     public Match updateMatch(Match match) {
-        match.setUpdatedOn(OffsetDateTime.now(ZoneOffset.UTC));
+        match.setUpdatedOn(LocalDateTime.now(ZoneOffset.UTC));
         return matchRepository.save(match);
     }
 }

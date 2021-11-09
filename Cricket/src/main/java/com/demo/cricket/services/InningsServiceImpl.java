@@ -51,25 +51,7 @@ public class InningsServiceImpl implements InningsService {
         return innings;
     }
 
-    @Override
-    public Innings startFirstInnings(Match match) {
-        Innings innings = match.getFirstInnings();
-
-        startInnings(innings);
-
-        return innings;
-    }
-
-    @Override
-    public Innings startSecondInnings(Match match) {
-        Innings innings = match.getSecondInnings();
-
-        startInnings(innings);
-
-        return innings;
-    }
-
-    public Innings createInnings(Integer inningsNumber, String battingTeamId, String bowlingTeamId) {
+    public Innings createInnings(int inningsNumber, String battingTeamId, String bowlingTeamId) {
         Innings innings = new Innings();
         innings.setNumber(inningsNumber);
 
@@ -82,22 +64,5 @@ public class InningsServiceImpl implements InningsService {
         innings.setInningsState(InningsState.NOTSTARTED);
 
         return innings;
-    }
-
-    private void startInnings(Innings innings) {
-        List<PlayerStat> battingTeamPLayersStatList = innings.getBattingTeamStat().getPlayersStat();
-
-        PlayerStat firstBatsman = battingTeamPLayersStatList.stream().filter(x ->  x.getPlayerState() == PlayerState.NOTOUT).findAny().get();
-        innings.setCurrentFirstBatsmanId(firstBatsman.getPlayerId());
-
-        PlayerStat secondBatsman = battingTeamPLayersStatList.stream().filter(x -> x.getPlayerId() != firstBatsman.getPlayerId()
-                && x.getPlayerState() == PlayerState.NOTOUT).findAny().get();
-        innings.setCurrentSecondBatsmanId(secondBatsman.getPlayerId());
-
-        List<PlayerStat> bowlingTeamPLayersStatList = innings.getBowlingTeamStat().getPlayersStat();
-        PlayerStat bowler = bowlingTeamPLayersStatList.stream().findAny().get();
-        innings.setCurrentBowlerId(bowler.getPlayerId());
-
-        innings.setInningsState(InningsState.INPROGRESS);
     }
 }

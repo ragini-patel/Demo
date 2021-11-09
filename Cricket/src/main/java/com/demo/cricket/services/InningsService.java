@@ -7,8 +7,4 @@ public interface InningsService {
     Innings createFirstInnings(Match match);
 
     Innings createSecondInnings(Match match);
-
-    Innings startFirstInnings(Match match);
-
-    Innings startSecondInnings(Match match);
 }

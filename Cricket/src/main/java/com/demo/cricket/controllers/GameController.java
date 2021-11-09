@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 public class GameController {
 
@@ -26,7 +28,7 @@ public class GameController {
         return "Welcome!";
     }
 
-    @GetMapping ("/startMatch/matches/{matchId}")
+    @GetMapping ("/startMatch/{matchId}")
     public Match startMatch(@PathVariable("matchId") String matchId) {
         Match match = matchService.getMatchById(matchId);
 
@@ -44,31 +46,33 @@ public class GameController {
         return matchService.updateMatch(match);
     }
 
-    @GetMapping ("/startFirstInnings/matches/{matchId}")
+    @GetMapping ("/startFirstInnings/{matchId}")
     public Match startFirstInnings(@PathVariable("matchId") String matchId) {
         Match match = matchService.getMatchById(matchId);
 
         // start innings
-        Innings innings = inningsService.startFirstInnings(match);
+        Innings innings = match.getFirstInnings();
+        startInnings(innings);
         match.setFirstInnings(innings);
-        match.setCurrentInningNumber(innings.getNumber());
+        match.setCurrentInningsNumber(innings.getNumber());
 
         return matchService.updateMatch(match);
     }
 
-    @GetMapping ("/startSecondInnings/matches/{matchId}")
+    @GetMapping ("/startSecondInnings/{matchId}")
     public Match startSecondInnings(@PathVariable("matchId") String matchId) {
         Match match = matchService.getMatchById(matchId);
 
         // start innings
-        Innings innings = inningsService.startSecondInnings(match);
+        Innings innings = match.getSecondInnings();
+        startInnings(innings);
         match.setSecondInnings(innings);
-        match.setCurrentInningNumber(innings.getNumber());
+        match.setCurrentInningsNumber(innings.getNumber());
 
         return matchService.updateMatch(match);
     }
 
-    @GetMapping("/throwBall/matches/{matchId}}")
+    @GetMapping("/throwBall/{matchId}}")
     public Match throwBall(@PathVariable("matchId") String matchId){
         Match match = matchService.getMatchById(matchId);
 
@@ -76,7 +80,7 @@ public class GameController {
             return match;
         }
 
-        Innings innings = match.getCurrentInningNumber() == 1 ? match.getFirstInnings() : match.getSecondInnings();
+        Innings innings = match.getCurrentInningsNumber() == 1 ? match.getFirstInnings() : match.getSecondInnings();
 
         setOverAndBallStatus(innings);
 
@@ -87,22 +91,28 @@ public class GameController {
         if(match.getNoOfOvers() == innings.getCurrentOverNumber() && innings.getCurrentBallNumber() == 6){
             innings.setInningsState(InningsState.COMPLETED);
 
-            if(match.getCurrentInningNumber() == 2)
+            if(match.getCurrentInningsNumber() == 2)
             {
                 // todo: check score for winning team or DRAW
                 match.setMatchState(MatchState.COMPLETED);
             }
         }
 
+        if(match.getCurrentInningsNumber() == 1) {
+            match.setFirstInnings(innings);
+        }else {
+            match.setSecondInnings(innings);
+        }
+
         return matchService.updateMatch(match);
     }
 
-    @GetMapping("/getScoreBoard/matches/{matchId}")
+    @GetMapping("/getScoreBoard/{matchId}")
     public Match getScoreBoard(@PathVariable("matchId") String matchId){
         return matchService.getMatchById(matchId);
     }
 
-    @GetMapping("/cancelMatch/matches/{matchId}")
+    @GetMapping("/cancelMatch/{matchId}")
     public Match cancelMatch(@PathVariable("matchId") String matchId){
         Match match = matchService.getMatchById(matchId);
         match.setMatchState(MatchState.CANCELLED);
@@ -114,6 +124,35 @@ public class GameController {
         // todo: random generator
         match.setTossWinnerTeamId(match.getFirstTeamId());
         match.setTossWinnerTeamRole(TeamRole.BATTIG);
+    }
+
+    private void startInnings(Innings innings) {
+        List<PlayerStat> battingTeamPLayersStatList = innings.getBattingTeamStat().getPlayersStat();
+
+        PlayerStat firstBatsman = battingTeamPLayersStatList.stream().filter(x ->  x.getPlayerState() == PlayerState.NOTOUT).findAny().get();
+        innings.setCurrentFirstBatsmanId(firstBatsman.getPlayerId());
+
+        String nextBatsmanId = getNextBatsman(innings);
+        innings.setCurrentSecondBatsmanId(nextBatsmanId);
+
+        String nextBowlerId = getNextBowler(innings);
+        innings.setCurrentBowlerId(nextBowlerId);
+
+        innings.setInningsState(InningsState.INPROGRESS);
+    }
+
+    private String getNextBowler(Innings innings) {
+        List<PlayerStat> bowlingTeamPLayersStatList = innings.getBowlingTeamStat().getPlayersStat();
+        PlayerStat bowler = bowlingTeamPLayersStatList.stream().findAny().get();
+        return bowler.getPlayerId();
+    }
+
+    private String getNextBatsman(Innings innings) {
+        List<PlayerStat> battingTeamPLayersStatList = innings.getBattingTeamStat().getPlayersStat();
+
+        PlayerStat nextBatsman = battingTeamPLayersStatList.stream().filter(x -> x.getPlayerId() != innings.getCurrentFirstBatsmanId()
+                && x.getPlayerState() == PlayerState.NOTOUT).findAny().get();
+        return nextBatsman.getPlayerId();
     }
 
     private Score getCurrentBallScore() {
@@ -140,13 +179,24 @@ public class GameController {
 
         innings.getOvers().set(overNumber, currentOver);
 
-        Score currentMatchScore = innings.getScore();
-        currentOverScore.setRuns(currentOverScore.getRuns() + currentBallScore.getRuns());
-        currentOverScore.setWickets(currentOverScore.getWickets() + currentBallScore.getWickets());
+        Score currentInningsScore = innings.getScore();
+        currentInningsScore.setRuns(currentInningsScore.getRuns() + currentInningsScore.getRuns());
+        currentInningsScore.setWickets(currentInningsScore.getWickets() + currentInningsScore.getWickets());
+        innings.setScore(currentInningsScore);
 
-        // todo: update teams score
+        if (currentBallScore.getWickets() == 1) {
+            // add new wicket
+            int wicketNumber = currentInningsScore.getWickets();
+            innings.getWickets().add(new Wicket(
+                    wicketNumber, ballNumber, overNumber, innings.getCurrentFirstBatsmanId(), innings.getCurrentBowlerId()));
 
-        innings.setScore(currentMatchScore);
+            // update batsman
+            innings.getBattingTeamStat().updatePlayerState(innings.getCurrentFirstBatsmanId(), PlayerState.OUT);
+
+            // get new batsman
+            innings.setCurrentFirstBatsmanId(innings.getCurrentFirstBatsmanId());
+            innings.setCurrentSecondBatsmanId(getNextBatsman(innings));
+        }
     }
 
     private void setOverAndBallStatus(Innings innings) {

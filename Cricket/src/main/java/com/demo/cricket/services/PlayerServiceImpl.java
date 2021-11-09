@@ -4,8 +4,7 @@ import com.demo.cricket.entities.Player;
 import com.demo.cricket.repositories.PlayerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
 @Service
@@ -19,14 +18,14 @@ public class PlayerServiceImpl implements PlayerService {
 
     @Override
     public Player createPlayer(Player player) {
-        player.setCreatedOn(OffsetDateTime.now(ZoneOffset.UTC));
-        player.setUpdatedOn(OffsetDateTime.now(ZoneOffset.UTC));
+        player.setCreatedOn(LocalDateTime.now(ZoneOffset.UTC));
+        player.setUpdatedOn(LocalDateTime.now(ZoneOffset.UTC));
         return playerRepository.save(player);
     }
 
     @Override
     public Player getById(String id) {
-        return playerRepository.findById(id).get();
+        return playerRepository.findById(id).orElse(null);
     }
 
     @Override

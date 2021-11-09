@@ -1,14 +1,11 @@
 package com.demo.cricket.entities;
 
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.time.OffsetDateTime;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Document(collection  = "player")
 @Data
@@ -20,8 +17,9 @@ public class Player {
     private String name;
     private String email;
     private String teamId;
-    private OffsetDateTime createdOn;
-    private OffsetDateTime updatedOn;
+    private PlayerType playerType;
+    private LocalDateTime createdOn;
+    private LocalDateTime updatedOn;
 
     public Player(String id, String name, String teamId) {
         this.id = id;
