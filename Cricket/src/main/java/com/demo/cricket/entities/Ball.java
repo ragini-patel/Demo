@@ -19,5 +19,6 @@ public class Ball {
         this.firstBatsmanId = firstBatsmanId;
         this.secondBatsmanId = secondBatsmanId;
         this.bowlerId = bowlerId;
+        this.score = new Score();
     }
 }

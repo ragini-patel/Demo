@@ -12,5 +12,6 @@ public class Over {
 
     public Over() {
         balls = new ArrayList<>();
+        score = new Score();
     }
 }

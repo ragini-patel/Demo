@@ -23,5 +23,6 @@ public class Innings {
         overs = new ArrayList<>();
         wickets = new ArrayList<>();
         inningsState = InningsState.NOTSTARTED;
+        score = new Score();
     }
 }

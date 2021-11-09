@@ -7,8 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
-
+import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 @RestController
 public class GameController {
@@ -72,7 +73,7 @@ public class GameController {
         return matchService.updateMatch(match);
     }
 
-    @GetMapping("/throwBall/{matchId}}")
+    @GetMapping("/throwBall/{matchId}")
     public Match throwBall(@PathVariable("matchId") String matchId){
         Match match = matchService.getMatchById(matchId);
 
@@ -88,14 +89,14 @@ public class GameController {
         setScore(innings, currentBallScore);
 
         // check and update innings and match state
-        if(match.getNoOfOvers() == innings.getCurrentOverNumber() && innings.getCurrentBallNumber() == 6){
+        if(match.getNoOfOvers() == innings.getCurrentOverNumber() && innings.getCurrentBallNumber() == 6) {
             innings.setInningsState(InningsState.COMPLETED);
+        }
 
-            if(match.getCurrentInningsNumber() == 2)
-            {
-                // todo: check score for winning team or DRAW
-                match.setMatchState(MatchState.COMPLETED);
-            }
+        // update match state if match is over
+        if(innings.getInningsState() == InningsState.COMPLETED && match.getCurrentInningsNumber() == 2) {
+            // todo: check score for winning team or DRAW
+            match.setMatchState(MatchState.COMPLETED);
         }
 
         if(match.getCurrentInningsNumber() == 1) {
@@ -121,9 +122,17 @@ public class GameController {
     }
 
     private void setTossResult(Match match) {
-        // todo: random generator
-        match.setTossWinnerTeamId(match.getFirstTeamId());
-        match.setTossWinnerTeamRole(TeamRole.BATTIG);
+        Random rand = new Random();
+
+        // 0 - first team and 1 - second team
+        int team = rand.nextInt(2);
+        String teamId = team == 0 ? match.getFirstTeamId() : match.getSecondTeamId();
+        match.setTossWinnerTeamId(teamId);
+
+        //  0 - batting and 1 - bowling
+        int preference = rand.nextInt(2);
+        TeamRole teamRole = preference == 0 ? TeamRole.BATTIG : TeamRole.BOWLING;
+        match.setTossWinnerTeamRole(teamRole);
     }
 
     private void startInnings(Innings innings) {
@@ -150,53 +159,88 @@ public class GameController {
     private String getNextBatsman(Innings innings) {
         List<PlayerStat> battingTeamPLayersStatList = innings.getBattingTeamStat().getPlayersStat();
 
-        PlayerStat nextBatsman = battingTeamPLayersStatList.stream().filter(x -> x.getPlayerId() != innings.getCurrentFirstBatsmanId()
+        PlayerStat nextBatsman = battingTeamPLayersStatList.stream().filter(x -> !x.getPlayerId().equals(innings.getCurrentFirstBatsmanId())
                 && x.getPlayerState() == PlayerState.NOTOUT).findAny().get();
         return nextBatsman.getPlayerId();
     }
 
     private Score getCurrentBallScore() {
-        // todo : create random score generator
-        Score score = new Score();
-        score.setRuns(4);
+        int runs= 0;
+        int wickets = 0;
 
+        // randomly generate wicket (0) and runs (1-6)
+        int[] weights = {0, 6, 6, 5, 5, 4, 4};
+
+        Random rand = new Random();
+        int x = rand.nextInt(Arrays.stream(weights).sum() + 1);
+
+        int i = 0;
+        int sum = 0;
+        while(i<weights.length) {
+            sum += weights[i];
+            if(x - sum <= 0) {
+                break;
+            }
+            i++;
+        }
+
+        if(i == 0) {
+            wickets = 1;
+        }
+        else{
+            runs = i;
+        }
+
+        Score score = new Score();
+        score.setRuns(runs);
+        score.setWickets(wickets);
         return score;
     }
 
     private void setScore(Innings innings, Score currentBallScore) {
-        int overNumber = innings.getCurrentOverNumber() - 1;
-        Over currentOver = innings.getOvers().get(overNumber);
+        int currentOverIndex = innings.getCurrentOverNumber() - 1;
+        Over currentOver = innings.getOvers().get(currentOverIndex);
         Score currentOverScore = currentOver.getScore();
         currentOverScore.setRuns(currentOverScore.getRuns() + currentBallScore.getRuns());
         currentOverScore.setWickets(currentOverScore.getWickets() + currentBallScore.getWickets());
         currentOver.setScore(currentOverScore);
 
-        int ballNumber = innings.getCurrentBallNumber() - 1;
-        Ball currentBall = currentOver.getBalls().get(ballNumber);
+        int currentBallIndex = innings.getCurrentBallNumber() - 1;
+        Ball currentBall = currentOver.getBalls().get(currentBallIndex);
         currentBall.setScore(currentBallScore);
 
-        currentOver.getBalls().set(ballNumber, currentBall);
+        currentOver.getBalls().set(currentBallIndex, currentBall);
 
-        innings.getOvers().set(overNumber, currentOver);
+        innings.getOvers().set(currentOverIndex, currentOver);
 
         Score currentInningsScore = innings.getScore();
-        currentInningsScore.setRuns(currentInningsScore.getRuns() + currentInningsScore.getRuns());
-        currentInningsScore.setWickets(currentInningsScore.getWickets() + currentInningsScore.getWickets());
+        currentInningsScore.setRuns(currentInningsScore.getRuns() + currentBallScore.getRuns());
+        currentInningsScore.setWickets(currentInningsScore.getWickets() + currentBallScore.getWickets());
         innings.setScore(currentInningsScore);
 
-        if (currentBallScore.getWickets() == 1) {
-            // add new wicket
-            int wicketNumber = currentInningsScore.getWickets();
-            innings.getWickets().add(new Wicket(
-                    wicketNumber, ballNumber, overNumber, innings.getCurrentFirstBatsmanId(), innings.getCurrentBowlerId()));
-
-            // update batsman
-            innings.getBattingTeamStat().updatePlayerState(innings.getCurrentFirstBatsmanId(), PlayerState.OUT);
-
-            // get new batsman
-            innings.setCurrentFirstBatsmanId(innings.getCurrentFirstBatsmanId());
-            innings.setCurrentSecondBatsmanId(getNextBatsman(innings));
+        // no wickets then return
+        if (currentBallScore.getWickets() != 1) {
+            return;
         }
+
+        // add new wicket
+        int wicketNumber = currentInningsScore.getWickets();
+        innings.getWickets().add(new Wicket(
+                wicketNumber, currentBallIndex, currentOverIndex, innings.getCurrentFirstBatsmanId(), innings.getCurrentBowlerId()));
+
+        // update batsman
+        innings.getBattingTeamStat().updatePlayerState(innings.getCurrentFirstBatsmanId(), PlayerState.OUT);
+
+        // check if no batsman left
+        if(wicketNumber == innings.getBattingTeamStat().getPlayersStat().stream().count() - 1)
+        {
+            innings.setInningsState(InningsState.COMPLETED);
+            return;
+        }
+
+        // get new batsman
+        innings.setCurrentFirstBatsmanId(innings.getCurrentFirstBatsmanId());
+        innings.setCurrentSecondBatsmanId(getNextBatsman(innings));
     }
 
     private void setOverAndBallStatus(Innings innings) {
@@ -211,6 +255,7 @@ public class GameController {
 
             Over newOver = new Over();
             newOver.setNumber(currentOverNumber);
+            innings.getOvers().add(newOver);
         }
 
         // get current over and set new ball
