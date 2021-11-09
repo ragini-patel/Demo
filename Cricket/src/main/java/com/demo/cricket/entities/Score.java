@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class Score {
-    private Integer runs;
-    private Integer wickets;
+    private int runs;
+    private int wickets;
 }
