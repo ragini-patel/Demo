@@ -18,8 +18,15 @@ public class TeamStat {
         this.playersStat = new ArrayList<>();
     }
 
-    public void updatePlayerState(String playerId, PlayerState playerState)
-    {
+    public void updatePlayerState(String playerId, PlayerState playerState) {
         playersStat.stream().filter(x -> x.getPlayerId().equals(playerId)).findFirst().get().setPlayerState(playerState);
+    }
+
+    public Score getPlayerScore(String playerId) {
+        return playersStat.stream().filter(x -> x.getPlayerId().equals(playerId)).findFirst().get().getScore();
+    }
+
+    public void updatePlayerScore(String playerId, Score score) {
+        playersStat.stream().filter(x -> x.getPlayerId().equals(playerId)).findFirst().get().setScore(score);
     }
 }

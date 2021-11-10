@@ -1,11 +1,13 @@
 package com.demo.cricket.services;
 
 import com.demo.cricket.entities.Match;
+import com.demo.cricket.entities.MatchState;
 import com.demo.cricket.repositories.MatchRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.List;
 
 @Service
 public class MatchServiceImpl implements MatchService {
@@ -33,5 +35,10 @@ public class MatchServiceImpl implements MatchService {
     public Match updateMatch(Match match) {
         match.setUpdatedOn(LocalDateTime.now(ZoneOffset.UTC));
         return matchRepository.save(match);
+    }
+
+    @Override
+    public List<Match> getMatchesByState(MatchState matchState) {
+        return matchRepository.findMatchesByMatchState(matchState);
     }
 }

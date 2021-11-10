@@ -82,6 +82,9 @@ public class GameController {
         }
 
         Innings innings = match.getCurrentInningsNumber() == 1 ? match.getFirstInnings() : match.getSecondInnings();
+        if(innings.getInningsState() == InningsState.COMPLETED){
+            return match;
+        }
 
         setOverAndBallStatus(innings);
 
@@ -172,13 +175,13 @@ public class GameController {
         int[] weights = {0, 6, 6, 5, 5, 4, 4};
 
         Random rand = new Random();
-        int x = rand.nextInt(Arrays.stream(weights).sum() + 1);
+        int randomNum = rand.nextInt(Arrays.stream(weights).sum() + 1);
 
         int i = 0;
         int sum = 0;
         while(i<weights.length) {
             sum += weights[i];
-            if(x - sum <= 0) {
+            if(randomNum - sum <= 0) {
                 break;
             }
             i++;
@@ -218,17 +221,29 @@ public class GameController {
         currentInningsScore.setWickets(currentInningsScore.getWickets() + currentBallScore.getWickets());
         innings.setScore(currentInningsScore);
 
+        // update batsman score
+        if(currentBallScore.getRuns() >0){
+            Score batsmanScore = innings.getBattingTeamStat().getPlayerScore(innings.getCurrentFirstBatsmanId());
+            batsmanScore.setRuns(batsmanScore.getRuns() + currentBallScore.getRuns());
+            innings.getBattingTeamStat().updatePlayerScore(innings.getCurrentFirstBatsmanId(), batsmanScore);
+        }
+
         // no wickets then return
         if (currentBallScore.getWickets() != 1) {
             return;
         }
+
+        // update bowler score
+        Score bowlerScore = innings.getBowlingTeamStat().getPlayerScore(innings.getCurrentBowlerId());
+        bowlerScore.setRuns(bowlerScore.getRuns() + currentBallScore.getRuns());
+        innings.getBowlingTeamStat().updatePlayerScore(innings.getCurrentBowlerId(), bowlerScore);
 
         // add new wicket
         int wicketNumber = currentInningsScore.getWickets();
         innings.getWickets().add(new Wicket(
                 wicketNumber, currentBallIndex, currentOverIndex, innings.getCurrentFirstBatsmanId(), innings.getCurrentBowlerId()));
 
-        // update batsman
+        // update batsman state
         innings.getBattingTeamStat().updatePlayerState(innings.getCurrentFirstBatsmanId(), PlayerState.OUT);
 
         // check if no batsman left
