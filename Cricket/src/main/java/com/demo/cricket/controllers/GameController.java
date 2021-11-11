@@ -119,11 +119,28 @@ public class GameController {
     @GetMapping("/cancelMatch/{matchId}")
     public Match cancelMatch(@PathVariable("matchId") String matchId){
         Match match = matchService.getMatchById(matchId);
+
+        if(match.getMatchState() == MatchState.COMPLETED) {
+            return match;
+        }
+
+        if(match.getFirstInnings().getInningsState() != InningsState.COMPLETED) {
+            match.getFirstInnings().setInningsState(InningsState.CANCELLED);
+        }
+
+        if(match.getSecondInnings().getInningsState() != InningsState.COMPLETED) {
+            match.getSecondInnings().setInningsState(InningsState.CANCELLED);
+        }
+
         match.setMatchState(MatchState.CANCELLED);
 
         return matchService.updateMatch(match);
     }
 
+    /**
+     * @param match
+     * Randomly select team and preference for toss and update match
+     */
     private void setTossResult(Match match) {
         Random rand = new Random();
 
@@ -177,21 +194,21 @@ public class GameController {
         Random rand = new Random();
         int randomNum = rand.nextInt(Arrays.stream(weights).sum() + 1);
 
-        int i = 0;
-        int sum = 0;
-        while(i<weights.length) {
-            sum += weights[i];
-            if(randomNum - sum <= 0) {
+        int iterator = 0;
+        int currentSum = 0;
+        while(iterator<weights.length) {
+            currentSum += weights[iterator];
+            if(randomNum - currentSum <= 0) {
                 break;
             }
-            i++;
+            iterator++;
         }
 
-        if(i == 0) {
+        if(iterator == 0) {
             wickets = 1;
         }
         else{
-            runs = i;
+            runs = iterator;
         }
 
         Score score = new Score();

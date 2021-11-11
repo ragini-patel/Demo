@@ -4,7 +4,6 @@ import com.demo.cricket.entities.Match;
 import com.demo.cricket.entities.MatchState;
 import com.demo.cricket.services.MatchService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
